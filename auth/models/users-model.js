@@ -6,8 +6,16 @@ const jwt = require('jsonwebtoken');
 
 const users = mongoose.Schema({
   username: { type: String, required: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  // role: { type: String, required: true, default: 'regular', enum: ['guest', 'author', 'editor', 'admin']}
 })
+
+const roles = {
+  regular: ['read'],
+  writers: ['read', 'create'],
+  editors: ['read', 'create', 'update'],
+  administrators: ['read', 'create', 'update', 'delete']
+}
 
 users.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, 5);
@@ -19,7 +27,7 @@ users.methods.generateToken = function() {
   let tokenObject = {
     username: this.username,
   }
-  let token = jwt.sign(tokenObject, process.env.SHOES)
+  let token = jwt.sign(tokenObject, process.env.SECRET)
   return token;
 }
 
@@ -39,7 +47,7 @@ users.statics.validateBasic = async function (username, password) {
 
 users.statics.authenticateWithToken = async function (token) {
   try {
-    const parsedToken = jwt.verify(token, process.env.SHOES);
+    const parsedToken = jwt.verify(token, process.env.SECRET);
     const user = this.findOne({ username: parsedToken.username })
     return user;
   } catch (e) {

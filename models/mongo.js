@@ -51,7 +51,7 @@ class Model {
   }
 
   /**
-   * Deletes a recod in the model
+   * Deletes a record in the model
    * @param _id {string} Mongo Record ID
    * @returns {*}
    */

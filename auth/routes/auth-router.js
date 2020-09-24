@@ -4,6 +4,7 @@ const express = require('express');
 
 const basicAuth = require('../middleware/basic.js');
 const bearer = require('../middleware/bearer.js');
+const can = require('../middleware/acl');
 const users = require('../models/users-model.js');
 
 // Initialize Express Router
@@ -14,7 +15,8 @@ router.post('/signup', async (req, res, next) => {
   try {
     let obj = {
       username: req.body.username,
-      password: req.body.password
+      password: req.body.password,
+      //role: req.body.role
     }
 
     // Create a new instance from the schema, using that object
@@ -51,6 +53,18 @@ router.post('/signin', basicAuth, (req, res, next) => {
 
 router.get('/secret', bearer, (req, res) => {
   res.status(200).send(`Welcome, ${req.user.username}`)
+})
+
+router.get('/article', bearer, can('read'), (req, res, next) => {
+  res.status(200).send('you can read it');
+})
+
+router.get('/article', bearer, can('create'), (req, res, next) => {
+  res.status(200).send('you can create it');
+})
+
+router.get('/article', bearer, can('update'), (req, res, next) => {
+  res.status(200).send('you can update it');
 })
 
 module.exports = router;
