@@ -16,7 +16,7 @@ router.post('/signup', async (req, res, next) => {
     let obj = {
       username: req.body.username,
       password: req.body.password,
-      //role: req.body.role
+      role: req.body.role
     }
 
     // Create a new instance from the schema, using that object
@@ -55,15 +55,15 @@ router.get('/secret', bearer, (req, res) => {
   res.status(200).send(`Welcome, ${req.user.username}`)
 })
 
-router.get('/article', bearer, can('read'), (req, res, next) => {
-  res.status(200).send('you can read it');
+router.get('/article', bearer, can('update'), (req, res, next) => {
+  res.status(200).send('You can read it');
 })
 
-router.get('/article', bearer, can('create'), (req, res, next) => {
+router.post('/article', bearer, can('create'), (req, res, next) => {
   res.status(200).send('you can create it');
 })
 
-router.get('/article', bearer, can('update'), (req, res, next) => {
+router.put('/article', bearer, can('update'), (req, res, next) => {
   res.status(200).send('you can update it');
 })
 
