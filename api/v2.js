@@ -5,8 +5,9 @@ const cwd = process.cwd();
 const express = require('express');
 
 const modelFinder = require(`${cwd}/middleware/model-finder.js`);
-const bearer =require('../auth/middleware/bearer');
-const users = require('../auth/models/users-model');
+const bearer =require('../auth/middleware/bearer.js');
+const users = require('../auth/models/users-model.js');
+const can = require('../auth/middleware/acl.js');
 
 const router = express.Router();
 
@@ -24,13 +25,13 @@ router.get('/:model/schema', (request, response) => {
   response.status(200).json(request.model.jsonSchema());
 });
 
-router.get('/:model', bearer, handleGetAll);
 
 // CRUD
-router.post('/:model', handlePost);
-router.get('/:model/:id', handleGetOne);
-router.put('/:model/:id', handlePut);
-router.delete('/:model/:id', handleDelete);
+router.get('/:model', bearer, can('read'), handleGetAll);
+router.post('/:model', bearer, can('create'), handlePost);
+router.get('/:model/:id',bearer, can('read'), handleGetOne);
+router.put('/:model/:id',bearer, can('update'), handlePut);
+router.delete('/:model/:id',bearer, can('delete'), handleDelete);
 
 // Route Handlers
 function handleGetAll(request, response, next) {

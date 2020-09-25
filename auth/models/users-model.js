@@ -7,12 +7,12 @@ const jwt = require('jsonwebtoken');
 const users = mongoose.Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
-  role: { type: String, required: true, default: 'guest', enum: ['guest', 'author', 'editor', 'admin']}
+  role: { type: String, required: true, default: 'regular', enum: ['regular', 'writer', 'editor', 'administrators']}
 })
 
 const roles = {
-  guest: ['read'],
-  author: ['read', 'create'],
+  regular: ['read'],
+  writer: ['read', 'create'],
   editor: ['read', 'update', 'delete'],
   administrators: ['read', 'create', 'update', 'delete']
 }
