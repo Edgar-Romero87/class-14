@@ -3,18 +3,19 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const SECRET = process.env.SECRET || "sauce";
 
 const users = mongoose.Schema({
   username: { type: String, required: true },
   password: { type: String, required: true },
-  role: { type: String, required: true, default: 'regular', enum: ['regular', 'writer', 'editor', 'administrators']}
+  role: { type: String, required: true, default: 'regular', enum: ['regular', 'writer', 'editor', 'administrator']}
 })
 
 const roles = {
   regular: ['read'],
   writer: ['read', 'create'],
   editor: ['read', 'update', 'delete'],
-  administrators: ['read', 'create', 'update', 'delete']
+  administrator: ['read', 'create', 'update', 'delete']
 }
 
 users.pre('save', async function () {
@@ -34,7 +35,7 @@ users.methods.generateToken = function() {
     permissions: roles[this.role]
 
   }
-  let token = jwt.sign(tokenObject, process.env.SECRET)
+  let token = jwt.sign(tokenObject, SECRET)
   return token;
 }
 
@@ -54,7 +55,7 @@ users.statics.validateBasic = async function (username, password) {
 
 users.statics.authenticateWithToken = async function (token) {
   try {
-    const parsedToken = jwt.verify(token, process.env.SECRET);
+    const parsedToken = jwt.verify(token, SECRET);
     const user = this.findOne({ username: parsedToken.username })
     return user;
   } catch (e) {
